@@ -1,40 +1,68 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>موقعي التدريبي | Testing</title>
-  <link rel="stylesheet" href="styles.css" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>الكيف — قهوة وشاي مختص</title>
+  <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <header class="hero">
-    <p class="badge">GitHub Practice</p>
-    <h1>موقعي التدريبي</h1>
-    <p class="lead">صفحة بسيطة عشان أتمرّن على GitHub وأقوي ذاكرتي.</p>
-    <a class="btn" href="#about">وش هالمشروع؟</a>
+  <header class="site-header">
+    <div class="container header-inner">
+      <a class="logo" href="index.html">الكيف<span>قهوة وشاي مختص</span></a>
+      <nav class="nav" aria-label="القائمة الرئيسية">
+        <a href="index.html" data-nav="home" class="active">الرئيسية</a>
+        <a href="coffee.html" data-nav="coffee">قهوة</a>
+        <a href="tea.html" data-nav="tea">شاي</a>
+        <a href="tools.html" data-nav="tools">أدوات</a>
+        <a href="offers.html" data-nav="offers">عروض</a>
+        <a href="cart.html" data-nav="cart" class="cart-link">سلة<span class="cart-badge" data-cart-badge style="display:none"></span></a>
+        <a href="login.html" data-nav="account">حساب</a>
+      </nav>
+    </div>
   </header>
+
   <main>
-    <section id="about" class="card">
-      <h2>عن المشروع</h2>
-      <p>هذي ريبو اسمها <strong>testing</strong> — مو موقع إنتاج، بس تدريب: إنشاء ريبو، إضافة ملفات، ورفع تغييرات.</p>
+    <section class="hero">
+      <div class="container">
+        <h1>خذ وقتك. الكيف جاهز لما تبي.</h1>
+        <p>قهوة وشاي وأدوات تحضير — بهدوء، وبأسعار واضحة.</p>
+      </div>
     </section>
-    <section class="grid">
-      <article class="card">
-        <h3>1. Repository</h3>
-        <p>مجلد مشروعك على الإنترنت.</p>
-      </article>
-      <article class="card">
-        <h3>2. Commit</h3>
-        <p>حفظ لقطة من التغييرات مع رسالة.</p>
-      </article>
-      <article class="card">
-        <h3>3. Push / Pages</h3>
-        <p> downstream الملفات، وبعدين تفعّل GitHub Pages عشان الموقع يشتغل برابط.</p>
-      </article>
+
+    <section class="section">
+      <div class="container">
+        <h2 class="section-title">عروض اليوم</h2>
+        <p class="section-lead">عروض بسيطة في أعلى الصفحة — بدون نوافذ منبثقة.</p>
+        <div class="offers-strip" data-offers></div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="container">
+        <h2 class="section-title">مختارات من المتجر</h2>
+        <div class="product-grid" data-featured></div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="container">
+        <h2 class="section-title">عن الكيف</h2>
+        <div class="about-box">
+          <p><strong>الكيف</strong> متجر عربي لقهوة وشاي مختصين، مع أدوات تحضير عملية.</p>
+          <p class="mt-1">تصفّح بحرية، أضف للسلة كضيف. عند إتمام الطلب فقط نطلب منك تسجيل الدخول أو إنشاء حساب.</p>
+          <p class="mt-1">مرحباً بك — على مهل.</p>
+        </div>
+      </div>
     </section>
   </main>
-  <footer>
-    <p>abdullahalialhammadi-Aa / testing</p>
+
+  <footer class="site-footer">
+    <div class="container">
+      <p class="logo-sm">الكيف</p>
+      <p>© ٢٠٢٦ الكيف — قهوة وشاي مختص</p>
+    </div>
   </footer>
+  <script src="app.js"></script>
 </body>
 </html>
