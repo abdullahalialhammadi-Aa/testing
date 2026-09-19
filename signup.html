@@ -9,47 +9,48 @@
 <body>
   <header class="site-header">
     <div class="container header-inner">
-      <a class="logo" href="index.html">الكيف<span>قهوة وشاي مختص</span></a>
-      <nav class="nav" aria-label="القائمة الرئيسية">
-        <a href="index.html" data-nav="home">الرئيسية</a>
-        <a href="coffee.html" data-nav="coffee">قهوة</a>
-        <a href="tea.html" data-nav="tea">شاي</a>
-        <a href="tools.html" data-nav="tools">أدوات</a>
-        <a href="offers.html" data-nav="offers">عروض</a>
-        <a href="cart.html" data-nav="cart" class="cart-link">سلة<span class="cart-badge" data-cart-badge style="display:none"></span></a>
-        <a href="login.html" data-nav="account">حساب</a>
+      <a class="logo" href="index.html">الكيف<span data-i18n="brand_tag">قهوة وشاي مختص</span></a>
+      <nav class="nav" aria-label="Main">
+        <a href="index.html" data-nav="home" data-i18n="nav_home">الرئيسية</a>
+        <a href="coffee.html" data-nav="coffee" data-i18n="nav_coffee">قهوة</a>
+        <a href="tea.html" data-nav="tea" data-i18n="nav_tea">شاي</a>
+        <a href="tools.html" data-nav="tools" data-i18n="nav_tools">أدوات</a>
+        <a href="offers.html" data-nav="offers" data-i18n="nav_offers">عروض</a>
+        <a href="cart.html" data-nav="cart" class="cart-link"><span data-i18n="nav_cart">سلة</span><span class="cart-badge" data-cart-badge style="display:none"></span></a>
+        <a href="login.html" data-nav="account" data-i18n="nav_account">حساب</a>
+        <button type="button" class="lang-toggle" data-lang-toggle aria-label="Language">English</button>
       </nav>
     </div>
   </header>
 
   <main class="auth-wrap">
     <div class="auth-card">
-      <h1>إنشاء حساب</h1>
-      <p class="lead">حساب بسيط على جهازك فقط (تجريبي) — ثم نكمّل الطلب.</p>
+      <h1 data-i18n="signup_title">إنشاء حساب</h1>
+      <p class="lead" data-i18n="signup_lead">حساب بسيط على جهازك فقط (تجريبي) — ثم نكمّل الطلب.</p>
       <div class="form-error" role="alert"></div>
       <form data-signup-form>
         <div class="form-group">
-          <label for="name">الاسم</label>
+          <label for="name" data-i18n="name">الاسم</label>
           <input type="text" id="name" name="name" required autocomplete="name">
         </div>
         <div class="form-group">
-          <label for="email">البريد الإلكتروني</label>
+          <label for="email" data-i18n="email">البريد الإلكتروني</label>
           <input type="email" id="email" name="email" required autocomplete="email" dir="ltr">
         </div>
         <div class="form-group">
-          <label for="password">كلمة المرور</label>
+          <label for="password" data-i18n="password">كلمة المرور</label>
           <input type="password" id="password" name="password" required minlength="4" autocomplete="new-password" dir="ltr">
         </div>
-        <button type="submit" class="btn btn-primary btn-block">إنشاء الحساب</button>
+        <button type="submit" class="btn btn-primary btn-block" data-i18n="signup_btn">إنشاء الحساب</button>
       </form>
-      <p class="form-footer">عندك حساب؟ <a href="login.html" data-auth-link>تسجيل الدخول</a></p>
+      <p class="form-footer"><span data-i18n="have_account">عندك حساب؟</span> <a href="login.html" data-auth-link data-i18n="login_link">تسجيل الدخول</a></p>
     </div>
   </main>
 
   <footer class="site-footer">
     <div class="container">
       <p class="logo-sm">الكيف</p>
-      <p>© ٢٠٢٦ الكيف — قهوة وشاي مختص</p>
+      <p data-i18n="footer">© ٢٠٢٦ الكيف — قهوة وشاي مختص · الإمارات</p>
     </div>
   </footer>
   <script src="app.js"></script>

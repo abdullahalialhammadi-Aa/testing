@@ -1,38 +1,33 @@
-# الكيف — متجر قهوة وشاي مختص
+# الكيف — Al-Kayf Specialty Coffee & Tea
 
-موقع ثابت (HTML/CSS/JS) لمتجر عربي متخصص في القهوة والشاي وأدوات التحضير.
+Static HTML/CSS/JS shop for specialty coffee, tea, and brew tools. Built for the UAE (prices in **AED / د.إ**).
 
-## المميزات
-- واجهة عربية بالكامل (`dir=rtl`)
-- تصفح وإضافة للسلة بدون حساب
-- إتمام الطلب يطلب تسجيل دخول أو إنشاء حساب (تجريبي عبر localStorage)
-- عروض ظاهرة في أعلى الصفحة الرئيسية
+## Features
+- Arabic ↔ English language toggle (persisted in `localStorage`)
+- RTL for Arabic, LTR for English
+- Browse and add to cart without an account
+- Checkout requires sign-in / sign-up (demo via `localStorage`)
+- Offers shown on the homepage (no pop-ups)
+- Product photos in `images/`
 
-## التشغيل محلياً
-1. انسخ المجلد أو استنسخ المستودع.
-2. افتح ملف `index.html` مباشرة في المتصفح، أو شغّل خادماً بسيطاً:
-
+## Run locally
 ```bash
-cd alkayf   # أو جذر الملفات إن كانت في الجذر
-python3 -m http.server 8080
+cd alkayf   # or repo root if files are at root
+python3 -m http.server 8765
 ```
+Open: `http://localhost:8765`
 
-ثم افتح: `http://localhost:8080`
+## GitHub Pages
+1. Repo **Settings** → **Pages**
+2. Source: **Deploy from a branch**
+3. Branch: `main`, folder: `/ (root)`
+4. Save and wait a minute for the site URL
 
-## تفعيل GitHub Pages
-1. ادخل إلى المستودع على GitHub.
-2. **Settings** → **Pages**.
-3. تحت **Source** اختر **Deploy from a branch**.
-4. Branch: `main` والمجلد: `/ (root)` — أو `/alkayf` إن رُفعت الملفات داخل مجلد.
-5. احفظ، وانتظر دقيقة ثم افتح رابط الصفحات الذي يظهر.
-
-## الصور
-صور المنتجات محفوظة محلياً في مجلد `images/` من مصادر مجانية (Unsplash). تُنسب الصور لمصوريها عبر Unsplash License — للاستخدام التجاري والتعليمي بحرية مع عدم الإيحاء برعاية العلامة.
-
-## هيكل الملفات
-- `index.html` — الرئيسية
-- `coffee.html` / `tea.html` / `tools.html` — التصنيفات
-- `offers.html` — العروض
-- `cart.html` — السلة
-- `login.html` / `signup.html` — الحساب
-- `styles.css` / `app.js` — التنسيق والمنطق
+## Files
+- `index.html` — home
+- `coffee.html` / `tea.html` / `tools.html` — categories
+- `offers.html` — offers
+- `cart.html` — cart
+- `login.html` / `signup.html` — account
+- `styles.css` / `app.js` — styles & logic
+- `images/` — product photos

@@ -9,23 +9,24 @@
 <body>
   <header class="site-header">
     <div class="container header-inner">
-      <a class="logo" href="index.html">الكيف<span>قهوة وشاي مختص</span></a>
-      <nav class="nav" aria-label="القائمة الرئيسية">
-        <a href="index.html" data-nav="home">الرئيسية</a>
-        <a href="coffee.html" data-nav="coffee">قهوة</a>
-        <a href="tea.html" data-nav="tea">شاي</a>
-        <a href="tools.html" data-nav="tools">أدوات</a>
-        <a href="offers.html" data-nav="offers">عروض</a>
-        <a href="cart.html" data-nav="cart" class="cart-link">سلة<span class="cart-badge" data-cart-badge style="display:none"></span></a>
-        <a href="login.html" data-nav="account">حساب</a>
+      <a class="logo" href="index.html">الكيف<span data-i18n="brand_tag">قهوة وشاي مختص</span></a>
+      <nav class="nav" aria-label="Main">
+        <a href="index.html" data-nav="home" data-i18n="nav_home">الرئيسية</a>
+        <a href="coffee.html" data-nav="coffee" data-i18n="nav_coffee">قهوة</a>
+        <a href="tea.html" data-nav="tea" data-i18n="nav_tea">شاي</a>
+        <a href="tools.html" data-nav="tools" data-i18n="nav_tools">أدوات</a>
+        <a href="offers.html" data-nav="offers" data-i18n="nav_offers">عروض</a>
+        <a href="cart.html" data-nav="cart" class="cart-link"><span data-i18n="nav_cart">سلة</span><span class="cart-badge" data-cart-badge style="display:none"></span></a>
+        <a href="login.html" data-nav="account" data-i18n="nav_account">حساب</a>
+        <button type="button" class="lang-toggle" data-lang-toggle aria-label="Language">English</button>
       </nav>
     </div>
   </header>
 
   <main class="container">
     <div class="page-header">
-      <h1>العروض</h1>
-      <p>أسعار أوضح قبل وبعد — اختر العرض وانتقل للتصفح.</p>
+      <h1 data-i18n="offers_title">العروض</h1>
+      <p data-i18n="offers_page_lead">أسعار أوضح قبل وبعد بالدرهم — اختر العرض وانتقل للتصفح.</p>
     </div>
     <div class="offers-strip section" data-offers></div>
   </main>
@@ -33,7 +34,7 @@
   <footer class="site-footer">
     <div class="container">
       <p class="logo-sm">الكيف</p>
-      <p>© ٢٠٢٦ الكيف — قهوة وشاي مختص</p>
+      <p data-i18n="footer">© ٢٠٢٦ الكيف — قهوة وشاي مختص · الإمارات</p>
     </div>
   </footer>
   <script src="app.js"></script>
