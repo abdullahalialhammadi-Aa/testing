@@ -670,9 +670,17 @@ img {
 }
 
 .form-group input:focus {
-  outline: none;
   border-color: var(--accent-soft);
   box-shadow: 0 0 0 3px rgba(196, 165, 116, 0.15);
+}
+
+/* Visible keyboard focus for inputs, buttons and links */
+input:focus-visible,
+button:focus-visible,
+a:focus-visible,
+.btn:focus-visible {
+  outline: 2px solid var(--accent-soft);
+  outline-offset: 2px;
 }
 
 .form-footer {

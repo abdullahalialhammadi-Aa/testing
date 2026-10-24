@@ -6,6 +6,14 @@
   const SESSION_KEY = "alkayf_session";
   const USERS_KEY = "alkayf_users";
   const LANG_KEY = "alkayf_lang";
+  const ORDERS_KEY = "alkayf_orders";
+
+  // Shop owner's WhatsApp number in international format, digits only
+  // (e.g. "971501234567"). Leave empty to only save orders in the browser.
+  const ORDER_WHATSAPP = "";
+
+  // Pages that ?next= may redirect to after sign-in / sign-up.
+  const SAFE_NEXT_PAGES = ["index.html", "cart.html", "coffee.html", "tea.html", "tools.html", "offers.html"];
 
   const PRODUCTS = [
     {
@@ -252,6 +260,16 @@
       logout_confirm: "تسجيل الخروج؟",
       order_thanks: "طلبك جاهز — شكراً لك يا ",
       guest: "ضيفنا",
+      order_number: "رقم الطلب",
+      order_saved_note: "حفظنا طلبك على هذا الجهاز. احتفظ برقم الطلب للمتابعة.",
+      order_whatsapp_note: "فتحنا واتساب لإرسال تفاصيل الطلب للمتجر — اضغط إرسال لإكماله.",
+      order_wa_title: "طلب جديد من الكيف",
+      order_wa_customer: "العميل",
+      continue_shopping: "متابعة التسوق",
+      add_offer: "أضف العرض للسلة",
+      bundle: "باقة",
+      lang_aria: "التبديل إلى الإنجليزية",
+      err_crypto: "المتصفح لا يدعم التشفير الآمن (افتح الموقع عبر https). لا يمكن إنشاء الحساب.",
       page_title_home: "الكيف — قهوة وشاي مختص",
       page_title_coffee: "قهوة — الكيف",
       page_title_tea: "شاي — الكيف",
@@ -328,6 +346,16 @@
       logout_confirm: "Sign out?",
       order_thanks: "Your order is ready — thank you, ",
       guest: "friend",
+      order_number: "Order number",
+      order_saved_note: "Your order is saved on this device. Keep the order number for follow-up.",
+      order_whatsapp_note: "We opened WhatsApp with your order details for the shop — tap Send to complete it.",
+      order_wa_title: "New Al-Kayf order",
+      order_wa_customer: "Customer",
+      continue_shopping: "Continue shopping",
+      add_offer: "Add offer to cart",
+      bundle: "Bundle",
+      lang_aria: "Switch to Arabic",
+      err_crypto: "This browser does not support secure encryption (open the site over https). The account cannot be created.",
       page_title_home: "Al-Kayf — Specialty coffee & tea",
       page_title_coffee: "Coffee — Al-Kayf",
       page_title_tea: "Tea — Al-Kayf",
@@ -402,7 +430,10 @@
     if (titleMap[page]) document.title = t(titleMap[page]);
 
     const langBtn = document.querySelector("[data-lang-toggle]");
-    if (langBtn) langBtn.textContent = t("lang_btn");
+    if (langBtn) {
+      langBtn.textContent = t("lang_btn");
+      langBtn.setAttribute("aria-label", t("lang_aria"));
+    }
   }
 
   function getCart() {
@@ -447,8 +478,25 @@
     return PRODUCTS.find((p) => p.id === id);
   }
 
+  function getOffer(id) {
+    return OFFERS.find((o) => o.id === id);
+  }
+
+  // Any purchasable item: a product, or an offer as a bundle priced at `after`.
+  function getItem(id) {
+    const p = getProduct(id);
+    if (p) return p;
+    const o = getOffer(id);
+    if (!o) return null;
+    return { id: o.id, name: o.title, desc: o.note, price: o.after, image: o.image, bundle: true };
+  }
+
+  function qtyOf(i) {
+    return Number(i && i.qty) || 0;
+  }
+
   function cartCount() {
-    return getCart().reduce((n, i) => n + i.qty, 0);
+    return getCart().reduce((n, i) => n + qtyOf(i), 0);
   }
 
   function updateCartBadge() {
@@ -474,11 +522,11 @@
 
   function addToCart(productId, qty) {
     qty = qty || 1;
-    const product = getProduct(productId);
+    const product = getItem(productId);
     if (!product) return;
     const cart = getCart();
     const existing = cart.find((i) => i.id === productId);
-    if (existing) existing.qty += qty;
+    if (existing) existing.qty = qtyOf(existing) + qty;
     else cart.push({ id: productId, qty });
     saveCart(cart);
     showToast(t("toast_added"));
@@ -500,8 +548,8 @@
 
   function cartTotal() {
     return getCart().reduce((sum, i) => {
-      const p = getProduct(i.id);
-      return sum + (p ? p.price * i.qty : 0);
+      const p = getItem(i.id);
+      return sum + (p ? p.price * qtyOf(i) : 0);
     }, 0);
   }
 
@@ -574,7 +622,8 @@
             <span class="price-before">${formatPrice(o.before)}</span>
             <span class="price-after">${formatPrice(o.after)}</span>
           </div>
-          <a class="btn btn-primary btn-sm" href="${o.href}">${t("browse_offer")}</a>
+          <button type="button" class="btn btn-primary btn-sm" data-add="${o.id}">${t("add_offer")}</button>
+          <a class="btn btn-ghost btn-sm" href="${o.href}">${t("browse_offer")}</a>
         </div>
       </article>`
     ).join("");
@@ -610,15 +659,16 @@
     }
     const rows = cart
       .map((i) => {
-        const p = getProduct(i.id);
+        const p = getItem(i.id);
         if (!p) return "";
+        const q = qtyOf(i);
         return `
         <tr data-cart-id="${p.id}">
           <td>
             <div class="cart-item-cell">
               <img class="cart-thumb" src="${p.image}" alt="" width="72" height="72">
               <div>
-                <strong>${loc(p.name)}</strong>
+                <strong>${p.bundle ? t("bundle") + ": " : ""}${loc(p.name)}</strong>
                 <div class="product-meta">${loc(p.desc)}</div>
               </div>
             </div>
@@ -627,11 +677,11 @@
           <td>
             <div class="qty-controls">
               <button type="button" data-qty-dec="${p.id}" aria-label="${t("dec")}">−</button>
-              <span>${i.qty}</span>
+              <span>${q}</span>
               <button type="button" data-qty-inc="${p.id}" aria-label="${t("inc")}">+</button>
             </div>
           </td>
-          <td>${formatPrice(p.price * i.qty)}</td>
+          <td>${formatPrice(p.price * q)}</td>
           <td><button type="button" class="btn btn-ghost btn-sm" data-remove="${p.id}">${t("remove")}</button></td>
         </tr>`;
       })
@@ -656,10 +706,101 @@
       </div>`;
   }
 
+  function getOrders() {
+    try {
+      const list = JSON.parse(localStorage.getItem(ORDERS_KEY) || "[]");
+      return Array.isArray(list) ? list : [];
+    } catch {
+      return [];
+    }
+  }
+
+  function makeOrderId(d) {
+    const pad = (n) => String(n).padStart(2, "0");
+    const ymd = String(d.getFullYear()).slice(-2) + pad(d.getMonth() + 1) + pad(d.getDate());
+    const rand = Math.floor(Math.random() * 0x10000).toString(16).toUpperCase().padStart(4, "0");
+    return "AK-" + ymd + "-" + rand;
+  }
+
+  function placeOrder(session) {
+    const items = getCart()
+      .map((i) => {
+        const p = getItem(i.id);
+        const qty = qtyOf(i);
+        if (!p || qty <= 0) return null;
+        return { id: p.id, name: loc(p.name), bundle: !!p.bundle, price: p.price, qty, subtotal: p.price * qty };
+      })
+      .filter(Boolean);
+    if (!items.length) return null;
+    const now = new Date();
+    const order = {
+      id: makeOrderId(now),
+      items,
+      total: items.reduce((s, i) => s + i.subtotal, 0),
+      currency: "AED",
+      date: now.toISOString(),
+      email: (session && session.email) || null,
+      name: (session && session.name) || null,
+    };
+    const orders = getOrders();
+    orders.push(order);
+    localStorage.setItem(ORDERS_KEY, JSON.stringify(orders));
+    saveCart([]);
+    return order;
+  }
+
+  function orderSummaryText(order) {
+    const lines = [t("order_wa_title"), t("order_number") + ": " + order.id];
+    if (order.email) lines.push(t("order_wa_customer") + ": " + (order.name ? order.name + " — " : "") + order.email);
+    lines.push("");
+    order.items.forEach((i) => {
+      lines.push("- " + (i.bundle ? t("bundle") + ": " : "") + i.name + " × " + i.qty + " = " + formatPrice(i.subtotal));
+    });
+    lines.push("");
+    lines.push(t("grand_total") + ": " + formatPrice(order.total));
+    return lines.join("\n");
+  }
+
+  function showOrderConfirmation(order, session, sentToWhatsApp) {
+    const wrap = document.querySelector("[data-cart-root]");
+    const thanks = t("order_thanks") + ((session && session.name) || t("guest"));
+    if (!wrap) {
+      showToast(thanks + " — " + t("order_number") + ": " + order.id);
+      return;
+    }
+    wrap.innerHTML = `
+      <div class="empty-cart" role="status">
+        <p><strong>${escapeHtml(thanks)}</strong></p>
+        <p>${t("order_number")}: <strong dir="ltr">${order.id}</strong></p>
+        <p>${t("grand_total")}: <strong>${formatPrice(order.total)}</strong></p>
+        <p class="text-muted">${sentToWhatsApp ? t("order_whatsapp_note") : t("order_saved_note")}</p>
+        <a class="btn btn-primary" href="index.html">${t("continue_shopping")}</a>
+      </div>`;
+  }
+
+  function escapeHtml(str) {
+    return String(str).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
+  }
+
   function requireAuthForCheckout() {
     const session = getSession();
     if (session) {
-      showToast(t("order_thanks") + (session.name || t("guest")));
+      const order = placeOrder(session);
+      if (!order) {
+        renderCart();
+        return;
+      }
+      let sent = false;
+      const wa = String(ORDER_WHATSAPP || "").replace(/\D/g, "");
+      if (wa) {
+        const url = "https://wa.me/" + wa + "?text=" + encodeURIComponent(orderSummaryText(order));
+        // Note: window.open with "noopener" always returns null, so detach manually.
+        const win = window.open(url, "_blank");
+        if (win) win.opener = null;
+        else location.href = url;
+        sent = true;
+      }
+      showOrderConfirmation(order, session, sent);
       return;
     }
     const returnTo = "cart.html";
@@ -695,36 +836,106 @@
     return new URLSearchParams(location.search).get(name);
   }
 
+  function safeNext(value) {
+    const v = String(value || "").trim().toLowerCase();
+    return SAFE_NEXT_PAGES.includes(v) ? v : "index.html";
+  }
+
+  function normEmail(v) {
+    return String(v || "").trim().toLowerCase();
+  }
+
+  function hasCrypto() {
+    return !!(window.crypto && window.crypto.subtle && window.crypto.getRandomValues);
+  }
+
+  function bytesToB64(bytes) {
+    let bin = "";
+    new Uint8Array(bytes).forEach((b) => (bin += String.fromCharCode(b)));
+    return btoa(bin);
+  }
+
+  function b64ToBytes(b64) {
+    const bin = atob(b64);
+    const out = new Uint8Array(bin.length);
+    for (let i = 0; i < bin.length; i++) out[i] = bin.charCodeAt(i);
+    return out;
+  }
+
+  const PBKDF2_ITERATIONS = 100000;
+
+  async function pbkdf2(password, saltBytes, iterations) {
+    const key = await crypto.subtle.importKey("raw", new TextEncoder().encode(password), "PBKDF2", false, ["deriveBits"]);
+    const bits = await crypto.subtle.deriveBits(
+      { name: "PBKDF2", hash: "SHA-256", salt: saltBytes, iterations },
+      key,
+      256
+    );
+    return bytesToB64(bits);
+  }
+
+  async function hashPassword(password) {
+    const salt = crypto.getRandomValues(new Uint8Array(16));
+    const hash = await pbkdf2(password, salt, PBKDF2_ITERATIONS);
+    return { salt: bytesToB64(salt), hash, iterations: PBKDF2_ITERATIONS };
+  }
+
+  async function verifyPassword(user, password) {
+    if (user.hash && user.salt) {
+      if (!hasCrypto()) return false;
+      const h = await pbkdf2(password, b64ToBytes(user.salt), Number(user.iterations) || PBKDF2_ITERATIONS);
+      return h === user.hash;
+    }
+    // Legacy account saved before hashing: plain-text password.
+    return typeof user.password === "string" && user.password === password;
+  }
+
   function initAuthForms() {
     const loginForm = document.querySelector("[data-login-form]");
     const signupForm = document.querySelector("[data-signup-form]");
-    const next = getQueryParam("next") || "index.html";
+    const next = safeNext(getQueryParam("next"));
 
     if (loginForm) {
-      loginForm.addEventListener("submit", (e) => {
+      loginForm.addEventListener("submit", async (e) => {
         e.preventDefault();
-        const email = loginForm.email.value.trim();
+        const email = normEmail(loginForm.email.value);
         const password = loginForm.password.value;
         const err = loginForm.querySelector(".form-error") || document.querySelector(".form-error");
         const users = getUsers();
-        const user = users.find((u) => u.email === email && u.password === password);
-        if (!user) {
+        const user = users.find((u) => normEmail(u.email) === email);
+        let ok = false;
+        try {
+          ok = !!user && (await verifyPassword(user, password));
+        } catch {
+          ok = false;
+        }
+        if (ok && typeof user.password === "string" && hasCrypto()) {
+          // Migrate legacy plain-text password to a salted hash.
+          try {
+            Object.assign(user, await hashPassword(password));
+            delete user.password;
+            saveUsers(users);
+          } catch {
+            /* keep legacy record; user can still sign in */
+          }
+        }
+        if (!ok) {
           if (err) {
             err.textContent = t("err_login");
             err.classList.add("show");
           }
           return;
         }
-        setSession({ name: user.name, email: user.email });
+        setSession({ name: user.name, email: normEmail(user.email) });
         location.href = next;
       });
     }
 
     if (signupForm) {
-      signupForm.addEventListener("submit", (e) => {
+      signupForm.addEventListener("submit", async (e) => {
         e.preventDefault();
         const name = signupForm.name.value.trim();
-        const email = signupForm.email.value.trim();
+        const email = normEmail(signupForm.email.value);
         const password = signupForm.password.value;
         const err = signupForm.querySelector(".form-error") || document.querySelector(".form-error");
         if (password.length < 4) {
@@ -734,15 +945,32 @@
           }
           return;
         }
+        if (!hasCrypto()) {
+          if (err) {
+            err.textContent = t("err_crypto");
+            err.classList.add("show");
+          }
+          return;
+        }
         const users = getUsers();
-        if (users.some((u) => u.email === email)) {
+        if (users.some((u) => normEmail(u.email) === email)) {
           if (err) {
             err.textContent = t("err_email_exists");
             err.classList.add("show");
           }
           return;
         }
-        users.push({ name, email, password });
+        let secret;
+        try {
+          secret = await hashPassword(password);
+        } catch {
+          if (err) {
+            err.textContent = t("err_crypto");
+            err.classList.add("show");
+          }
+          return;
+        }
+        users.push(Object.assign({ name, email }, secret));
         saveUsers(users);
         setSession({ name, email });
         location.href = next;
@@ -805,7 +1033,7 @@
     if (inc) {
       const id = inc.getAttribute("data-qty-inc");
       const item = getCart().find((i) => i.id === id);
-      if (item) setQty(id, item.qty + 1);
+      if (item) setQty(id, qtyOf(item) + 1);
       renderCart();
       return;
     }
@@ -813,7 +1041,7 @@
     if (dec) {
       const id = dec.getAttribute("data-qty-dec");
       const item = getCart().find((i) => i.id === id);
-      if (item) setQty(id, item.qty - 1);
+      if (item) setQty(id, qtyOf(item) - 1);
       renderCart();
       return;
     }
